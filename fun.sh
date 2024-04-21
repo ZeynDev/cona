@@ -16,6 +16,28 @@ purple="\e[0;33m"
 # ===================
 clear
 # Fungsi untuk loading animasi
+show_progress() {
+    local duration=$1
+    local progress=0
+    local progress_char='█'
+    local empty_char='░'
+    local width=40
+
+    while [ $progress -lt 100 ]; do
+        progress=$((progress + 2))
+        completed=$((width * progress / 100))
+        remaining=$((width - completed))
+
+        echo -ne "\r["
+        printf "%${completed}s" | tr ' ' "$progress_char"
+        printf "%${remaining}s" | tr ' ' "$empty_char"
+        echo -n "] $progress%"
+        sleep $duration
+    done
+
+    echo -ne "\n"
+}
+#################################
 loading_animation() {
     local delay=0.08
     local bars_chars=("▏" "▎" "▍" "▌" "▋" "▊" "▉" "█")
@@ -38,7 +60,7 @@ loading_animation() {
         sleep $delay
     done
 }
-
+##########################################
 loading() {
     local pid=$1
     local delay=0.1
@@ -955,15 +977,28 @@ clear
     profile
     enable_services
     restart_system
-    task_completed=true
 }
-task_completed=false
-loading_animation $$ &
-loading_pid=$!
-instal
-# Menghentikan loading dan menampilkan pesan "Sudah Selesai"
-kill $loading_pid # Menghentikan proses loading_animation
-printf "\n\e[1m\e[32mInstalasi Sudah Selesai\e[0m\n"
+################
+# Fungsi simulasi unduhan
+simulate_download() {
+    echo "Memulai unduhan..."
+    instal
+
+    # Simulasi unduhan
+    for ((i = 0; i < 100; i += 10)); do
+        sleep 1
+    done
+
+    echo "Unduhan selesai."
+}
+# Memanggil fungsi menampilkan progres bar dalam background
+show_progress 0.1 &
+
+# Memanggil fungsi simulasi unduhan
+simulate_download
+
+# Menghentikan progres bar dengan memberikan sinyal SIGTERM
+kill $!
 echo ""
 history -c
 rm -rf /root/menu
