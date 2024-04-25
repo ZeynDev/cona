@@ -16,26 +16,21 @@ purple="\e[0;33m"
 # ===================
 clear
 # Fungsi untuk loading animasi
-show_progress() {
-    local duration=$1
-    local progress=0
-    local progress_char='█'
-    local empty_char='░'
-    local width=40
+function bar_fun() {
+    local pid=$1
+    local delay=0.08
+    local spin='⣾⣽⣻⢿⡿⣟⣯⣷'
+    local spin_length=${#spin}
+    local i=0
 
-    while [ $progress -lt 100 ]; do
-        progress=$((progress + 2))
-        completed=$((width * progress / 100))
-        remaining=$((width - completed))
-
-        echo -ne "\r["
-        printf "%${completed}s" | tr ' ' "$progress_char"
-        printf "%${remaining}s" | tr ' ' "$empty_char"
-        echo -n "] $progress%"
-        sleep $duration
+    while ps a | grep -q $pid; do
+        local char=${spin:i%spin_length:1}
+        printf "\e[1m\e[96m%s\e[0m\r" "$char Installing... " # adding bold and cyan color
+        sleep $delay
+        i=$((i + 1))
     done
 
-    echo -ne "\n"
+    printf "\r%s\n" "Done!        "
 }
 #################################
 loading_animation() {
@@ -977,28 +972,15 @@ clear
     profile
     enable_services
     restart_system
+    process_pid=$!
+    # Panggil fungsi loading_animation() dengan PID dari proses 
+    bar_fun $process_pid
 }
+
+# Panggil fungsi instal()
+instal
+
 ################
-# Fungsi simulasi unduhan
-simulate_download() {
-    echo "Memulai unduhan..."
-    instal
-
-    # Simulasi unduhan
-    for ((i = 0; i < 100; i += 10)); do
-        sleep 1
-    done
-
-    echo "Unduhan selesai."
-}
-# Memanggil fungsi menampilkan progres bar dalam background
-show_progress 0.1 &
-
-# Memanggil fungsi simulasi unduhan
-simulate_download
-
-# Menghentikan progres bar dengan memberikan sinyal SIGTERM
-kill $!
 echo ""
 history -c
 rm -rf /root/menu
@@ -1060,6 +1042,7 @@ sleep 1
 echo -ne "[ ${yell}COMPLETED${NC} ] PENGINSTALAN SCRIPT SELESAI KETIK Y UNTUK REBOOT ! (y/n)? "
 read answer
 if [ "$answer" == "${answer#[Yy]}" ] ;then
+reboot
 exit 0
 else
 reboot
