@@ -16,21 +16,15 @@ purple="\e[0;33m"
 # ===================
 clear
 # Fungsi untuk loading animasi
-function bar_fun() {
-    local pid=$1
-    local delay=0.08
-    local spin='⣾⣽⣻⢿⡿⣟⣯⣷'
-    local spin_length=${#spin}
+fun_bar() {
+    local -r frames='-\|/'
+    local -r delay=0.1
     local i=0
-
-    while ps a | grep -q $pid; do
-        local char=${spin:i%spin_length:1}
-        printf "\e[1m\e[96m%s\e[0m\r" "$char Installing... " # adding bold and cyan color
+    while true; do
+        printf '\r%s' "${frames:$i:1} Sedang memuat..."
+        ((i = (i + 1) % ${#frames}))
         sleep $delay
-        i=$((i + 1))
     done
-
-    printf "\r%s\n" "Done!        "
 }
 #################################
 loading_animation() {
@@ -972,14 +966,23 @@ clear
     profile
     enable_services
     restart_system
-    process_pid=$!
-    # Panggil fungsi loading_animation() dengan PID dari proses 
-    bar_fun $process_pid
 }
-
+function pol_in() {
+complete=false
+    while [ "$complete" = false ]; do
+        # Jalankan task di sini
+	instal
+        sleep 1  # Contoh task: tunggu selama 1 detik
+        # Setelah task selesai, ubah complete menjadi true
+        complete=true
+    done
+}
 # Panggil fungsi instal()
-instal
-
+fun_bar &
+loading_pid=$!
+pol_in
+kill $loading_pid
+printf '\r%s\n' "Task selesai."
 ################
 echo ""
 history -c
