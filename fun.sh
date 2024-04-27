@@ -355,7 +355,7 @@ else
 sts="${Error}"
 fi
 TIMES="10"
-CHATID="-100209774114"
+CHATID="-1002043665914"
 KEY="7066738088:AAF9_fs-JXCq6nVmgAaX64ArA2LWkD3RCm0"
 URL="https://api.telegram.org/bot$KEY/sendMessage"
 ISP=$(cat /root/.isp)
@@ -978,7 +978,7 @@ complete=false
     done
 }
 # Panggil fungsi instal()
-fun_bar &
+loading &
 loading_pid=$!
 pol_in
 kill $loading_pid
